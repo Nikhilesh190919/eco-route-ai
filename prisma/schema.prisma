@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String?
+  hashedPassword String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  trips          Trip[]
+  settings       UserSettings?
+}
+
+model UserSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean @default(true)
+  theme             String   @default("system") // "light", "dark", or "system"
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Trip {
+  id          String       @id @default(cuid())
+  origin      String
+  destination String
+  budget      Int
+  dateStart   DateTime
+  dateEnd     DateTime
+  createdAt   DateTime     @default(now())
+  createdBy   String
+  user        User         @relation(fields: [createdBy], references: [id])
+  options     RouteOption[]
+}
+
+model RouteOption {
+  id          String @id @default(cuid())
+  tripId      String
+  trip        Trip   @relation(fields: [tripId], references: [id])
+  mode        String
+  cost        Int
+  durationMins Int
+  co2Kg       Float
+  ecoScore    Int
+  createdAt   DateTime @default(now())
+}
+

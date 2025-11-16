@@ -1,0 +1,125 @@
+import { prisma } from '@/lib/db';
+import { notFound } from 'next/navigation';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { AnimatedRouteCards } from '@/components/AnimatedRouteCards';
+import { CompareRoutes } from '@/components/CompareRoutes';
+import { LocationImages } from '@/components/LocationImages';
+import { RouteMap } from '@/components/RouteMap';
+import { TripSummary } from '@/components/TripSummary';
+import { PlanRoutesButton } from '@/components/PlanRoutesButton';
+
+type Props = { params: { id: string } };
+
+export default async function TripDetailPage({ params }: Props) {
+  try {
+    const trip = await prisma.trip.findUnique({
+      where: { id: params.id },
+      include: { options: true, user: true },
+    });
+    
+    if (!trip) {
+      notFound();
+    }
+
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 w-full">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold break-words leading-tight text-gray-900 dark:text-gray-100">
+            {trip.origin} → {trip.destination}
+          </h1>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">
+            <span className="font-medium">${trip.budget}</span> budget · 
+            <span className="ml-1">
+              {new Date(trip.dateStart).toLocaleDateString()} - {new Date(trip.dateEnd).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Location Images */}
+        <LocationImages origin={trip.origin} destination={trip.destination} />
+
+        {/* Trip Summary - Show at top if routes exist */}
+        {(() => {
+          const opts = trip?.options ?? [];
+          if (Array.isArray(opts) && opts.length > 0) {
+            const normalized = opts.map((o) => ({
+              ...o,
+              co2Kg: Number(o.co2Kg ?? o.co2kg ?? o.co2_kg ?? 0),
+            }));
+            return <TripSummary routes={normalized} />;
+          }
+          return null;
+        })()}
+
+        {/* Route Options */}
+        <div className="space-y-2">
+          {/* Check if routeOptions is empty - use Prisma's 'options' relation */}
+          {(() => {
+            const opts = trip?.options ?? [];
+            if (!Array.isArray(opts) || opts.length === 0) {
+              return (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm p-8 sm:p-12">
+                  <div className="text-center space-y-4">
+                    <div className="flex justify-center">
+                      <svg className="w-16 h-16 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                        No routes yet
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        Generate eco-friendly route options for this trip
+                      </p>
+                    </div>
+                    <PlanRoutesButton
+                      tripId={trip.id}
+                      origin={trip.origin}
+                      destination={trip.destination}
+                      budget={trip.budget}
+                    />
+                  </div>
+                </div>
+              );
+            }
+            
+            // Normalize options with safe fallbacks
+            const normalized = opts.map((o) => ({
+              ...o,
+              co2Kg: Number(o.co2Kg ?? o.co2kg ?? o.co2_kg ?? 0),
+            }));
+            
+            return (
+              <>
+                <AnimatedRouteCards routes={normalized} />
+                {/* Compare Routes section - only show if 2+ routes */}
+                {normalized.length >= 2 && (
+                  <div className="mt-6 sm:mt-8 space-y-6">
+                    <CompareRoutes routes={normalized} />
+                    {/* Route Map */}
+                    <RouteMap origin={trip.origin} destination={trip.destination} />
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('Trip detail error:', error);
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-6 sm:py-8 w-full">
+        <ErrorDisplay
+          title="Failed to load trip"
+          message="There was an error loading this trip. Please try again later."
+        />
+      </div>
+    );
+  }
+}
+
+
