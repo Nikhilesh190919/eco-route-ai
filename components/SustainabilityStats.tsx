@@ -16,7 +16,7 @@ import {
 import type { RouteOption, Trip } from '@/types/routes';
 
 type TripItem = Trip & {
-  options: RouteOption[]; // Map from routeOptions for backward compatibility
+  options: RouteOption[]; // Map from options for backward compatibility
 };
 
 type Props = {

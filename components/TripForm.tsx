@@ -22,7 +22,7 @@ export function TripForm({ onCreated, initialSuggestion }: { onCreated?: () => v
   const [planningError, setPlanningError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [planning, setPlanning] = useState(false);
-  const [routeOptions, setRouteOptions] = useState<RouteOption[]>([]);
+  const [options, setRouteOptions] = useState<RouteOption[]>([]);
   const [showOptions, setShowOptions] = useState(false);
   const [showEmptyState, setShowEmptyState] = useState(false);
   const { showToast, ToastContainer } = useToast();
@@ -172,7 +172,7 @@ export function TripForm({ onCreated, initialSuggestion }: { onCreated?: () => v
       // Include route options if available
       const requestBody = {
         ...data,
-        ...(routeOptions.length > 0 ? { routeOptions } : {}),
+        ...(options.length > 0 ? { options } : {}),
       };
 
       const res = await fetch('/api/trips', {
@@ -199,7 +199,7 @@ export function TripForm({ onCreated, initialSuggestion }: { onCreated?: () => v
       
       // If trip was created, redirect to trip detail page
       if (result.trip?.id) {
-        // Routes are already saved if routeOptions were included in the request
+        // Routes are already saved if options were included in the request
         // Redirect to trip detail page
         window.location.href = `/trip/${result.trip.id}`;
         return;
@@ -414,14 +414,14 @@ export function TripForm({ onCreated, initialSuggestion }: { onCreated?: () => v
         </button>
       </div>
 
-      {showOptions && routeOptions.length > 0 && (
+      {showOptions && options.length > 0 && (
         <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Route Options</h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{routeOptions.length} option{routeOptions.length !== 1 ? 's' : ''} found</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{options.length} option{options.length !== 1 ? 's' : ''} found</span>
           </div>
           <div className="space-y-2">
-            {routeOptions.map((option, idx) => (
+            {options.map((option, idx) => (
               <RouteCard
                 key={idx}
                 mode={option.mode}
@@ -436,7 +436,7 @@ export function TripForm({ onCreated, initialSuggestion }: { onCreated?: () => v
         </div>
       )}
       
-      {!planning && !showOptions && !showEmptyState && routeOptions.length === 0 && origin && destination && (
+      {!planning && !showOptions && !showEmptyState && options.length === 0 && origin && destination && (
         <div className="rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">Click "Plan Routes" to see eco-friendly options</p>
         </div>

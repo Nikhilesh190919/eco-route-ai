@@ -55,7 +55,7 @@ export default async function TripDetailPage({ params }: Props) {
 
         {/* Route Options */}
         <div className="space-y-2">
-          {/* Check if routeOptions is empty - use Prisma's 'options' relation */}
+          {/* Check if options is empty - use Prisma's 'options' relation */}
           {(() => {
             const opts = trip?.options ?? [];
             if (!Array.isArray(opts) || opts.length === 0) {

@@ -76,7 +76,7 @@ export const RouteOptionSchema = z.object({
   notes: z.string().optional(),
 }).strict(); // Strict mode to catch extra properties
 
-// Trip schema that includes routeOptions
+// Trip schema that includes options
 export const TripSchema = z.object({
   id: z.string(),
   origin: z.string(),
@@ -86,7 +86,7 @@ export const TripSchema = z.object({
   dateEnd: z.string().or(z.date()),
   createdAt: z.string().or(z.date()).optional(),
   updatedAt: z.string().or(z.date()).optional(),
-  routeOptions: z.array(RouteOptionSchema).default([]),
+  options: z.array(RouteOptionSchema).default([]),
 });
 
 export type PlanInput = z.infer<typeof planSchema>;

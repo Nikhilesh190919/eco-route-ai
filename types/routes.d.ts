@@ -1,3 +1,12 @@
+export interface Trip {
+  id: string;
+  origin: string;
+  destination: string;
+  budget: number;
+  dateStart: string;
+  dateEnd: string;
+  options: RouteOption[];
+}
 /**
  * Route mode types for transportation
  */
@@ -28,6 +37,6 @@ export interface Trip {
   dateEnd: string;
   createdAt?: string;
   updatedAt?: string;
-  routeOptions: RouteOption[]; // Required - TypeScript will error if missing
+  options: RouteOption[]; // Required - TypeScript will error if missing
 }
 
