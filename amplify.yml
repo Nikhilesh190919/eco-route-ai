@@ -6,7 +6,7 @@ frontend:
         - npm ci
     build:
       commands:
-        - npx next build --no-lint --no-type-check
+        - npx next build
   artifacts:
     baseDirectory: .next
     files:
