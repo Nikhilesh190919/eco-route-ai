@@ -1,16 +1,29 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - npm ci
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: .next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
+applications:
+  - appRoot: .
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - corepack enable
+            - yarn install --frozen-lockfile
+        build:
+          commands:
+            - yarn build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*
+    backend:
+      phases:
+        build:
+          commands: []
+    customHeaders:
+      - pattern: '**/*'
+        headers:
+          - key: Cache-Control
+            value: max-age=0,no-cache,no-store,must-revalidate
