@@ -63,7 +63,7 @@ export default async function DashboardPage() {
           durationMins: o.durationMins,
           co2Kg: o.co2Kg, // Required - TypeScript will error if missing
           ecoScore: o.ecoScore,
-          ...(o.notes ? { notes: o.notes } : {}),
+          // notes removed because not in DB type
         };
       }),
     }));

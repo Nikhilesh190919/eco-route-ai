@@ -147,22 +147,18 @@ export async function GET(req: NextRequest) {
 
     // 1. Get static US locations that match
     const staticLocations = filterUSLocations(q, 5);
-    staticLocations.forEach((loc) => {
+
+    staticLocations.forEach(loc => {
+      const name = typeof loc === "string" ? loc : loc.name;
+
       suggestions.push({
-        id: `static-${loc.toLowerCase().replace(/\s+/g, '-')}`,
-        label: loc,
-        destination: loc,
-        type: 'destination',
-        description: 'Popular destination',
+        id: `static-${name.toLowerCase().replace(/\s+/g, "-")}`,
+        label: name,
+        destination: name,
+        type: "destination",
+        description: "Popular destination",
       });
     });
-
-    // 2. Get AI suggestions (if query is long enough)
-    if (q.length >= 3) {
-      const aiSuggestions = await getAISuggestions(q);
-      suggestions.push(...aiSuggestions);
-    }
-
     // Deduplicate by label
     const seen = new Set<string>();
     const unique = suggestions.filter((s) => {
