@@ -39,8 +39,7 @@ export async function GET(req: NextRequest) {
           },
         ],
         max_tokens: 60,
-        temperature: 0.7,
-        timeout: 10000, // 10 second timeout
+        
       });
 
       const caption = completion.choices[0]?.message?.content?.trim() || `${location} – a beautiful destination for your eco-friendly journey.`;
